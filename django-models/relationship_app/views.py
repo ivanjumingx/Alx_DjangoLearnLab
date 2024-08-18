@@ -16,7 +16,8 @@ from django.contrib.auth import login
 from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
 from .models import UserProfile
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
 from django.utils.decorators import method_decorator
 
 # Function-Based View for Listing Books
