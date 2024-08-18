@@ -10,6 +10,9 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 # Function-Based View for Listing Books
 def list_books(request):
@@ -59,8 +62,9 @@ def user_register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # Redirect to login page after registration
+            user = form.save()
+            login(request, user)  # Log in the user after registration
+            return redirect('login')  # Redirect to the login page
     else:
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
