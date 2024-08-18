@@ -7,7 +7,7 @@ from .models import Book
 from .models import Library
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
@@ -16,18 +16,21 @@ from django.contrib.auth import login
 from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
 from .models import UserProfile
+from django.contrib.auth.decorators import login_required, permission_required
+from django.utils.decorators import method_decorator
 
 # Function-Based View for Listing Books
 def list_books(request):
     books = Book.objects.all()  # Fetch all books from the database
     return render(request, 'relationship_app/list_books.html', {'books': books})
 
+
 # Class-Based View for Displaying Library Details
 @method_decorator(login_required, name='dispatch')  # Ensure only authenticated users can access this view
 class LibraryDetailView(DetailView):
-    model = Library  # Model to use for this view
-    template_name = 'relationship_app/library_detail.html'  # Template to render
-    context_object_name = 'library'  # Name to use for the object in the template
+    model = Library
+    template_name = 'relationship_app/library_detail.html'
+    context_object_name = 'library'
 
 # Function-Based View for User Login
 def user_login(request):
@@ -87,3 +90,29 @@ def librarian_view(request):
 @user_passes_test(user_is_member)
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
+
+# Function-Based View for Adding a Book (requires permission)
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def add_book(request):
+    if request.method == 'POST':
+        # Logic to add a book
+        pass
+    return render(request, 'relationship_app/add_book.html')
+
+# Function-Based View for Changing a Book (requires permission)
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def change_book(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    if request.method == 'POST':
+        # Logic to change a book
+        pass
+    return render(request, 'relationship_app/change_book.html', {'book': book})
+
+# Function-Based View for Deleting a Book (requires permission)
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def delete_book(request, book_id):
+    book = Book.objects.get(pk=book_id)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('list_books')  # Redirect after deletion
+    return render(request, 'relationship_app/delete_book.html', {'book': book})
