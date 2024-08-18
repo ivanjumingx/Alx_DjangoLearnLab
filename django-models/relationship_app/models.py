@@ -45,6 +45,13 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.role}"
 
+    class Meta:
+        permissions = [
+            ("can_view_admin_dashboard", "Can view the admin dashboard"),
+            ("can_manage_libraries", "Can manage libraries"),
+            ("can_browse_books", "Can browse books"),
+        ]
+
 # Automatically create or update the UserProfile when a User is created or updated
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
