@@ -26,18 +26,6 @@ class LibraryDetailView(DetailView):
     template_name = 'relationship_app/library_detail.html'  # Template to render
     context_object_name = 'library'  # Name to use for the object in the template
 
-# Function-Based View for Listing Books
-def list_books(request):
-    books = Book.objects.all()
-    return render(request, 'relationship_app/list_books.html', {'books': books})
-
-# Class-Based View for Displaying Library Details
-@method_decorator(login_required, name='dispatch')
-class LibraryDetailView(DetailView):
-    model = Library
-    template_name = 'relationship_app/library_detail.html'
-    context_object_name = 'library'
-
 # Function-Based View for User Login
 def user_login(request):
     if request.method == 'POST':
@@ -63,7 +51,7 @@ def user_register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Log in the user after registration
+            auth_login(request, user)  # Log in the user after registration
             return redirect('login')  # Redirect to the login page
     else:
         form = UserCreationForm()
