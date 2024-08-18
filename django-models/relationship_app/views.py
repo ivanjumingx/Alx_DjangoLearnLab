@@ -13,6 +13,9 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from django.shortcuts import render
+from django.contrib.auth.decorators import user_passes_test
+from .models import UserProfile
 
 # Function-Based View for Listing Books
 def list_books(request):
@@ -56,3 +59,31 @@ def user_register(request):
     else:
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
+
+# Utility function to check user role
+def user_is_admin(user):
+    return user.userprofile.role == 'Admin'
+
+def user_is_librarian(user):
+    return user.userprofile.role == 'Librarian'
+
+def user_is_member(user):
+    return user.userprofile.role == 'Member'
+
+# Admin View
+@login_required
+@user_passes_test(user_is_admin)
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+# Librarian View
+@login_required
+@user_passes_test(user_is_librarian)
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+# Member View
+@login_required
+@user_passes_test(user_is_member)
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
