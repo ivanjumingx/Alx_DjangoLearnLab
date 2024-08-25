@@ -9,8 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-u6an7dnfe21)-iassum=!iq^q%#c-vwhngc2io+m3w+77q*$b+'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG to False for production
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -23,7 +23,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bookshelf',  # Ensure this line is included to register your app
+    'bookshelf',
+    'csp',
     # 'relationship_app',  # Uncomment if needed or remove if no longer used
 ]
 
@@ -35,6 +36,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'LibraryProject.urls'
@@ -108,3 +110,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Point AUTH_USER_MODEL to the custom user model
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
+# Enable the browser's XSS filter
+SECURE_BROWSER_XSS_FILTER = True
+
+# Enable the X-Frame-Options header
+X_FRAME_OPTIONS = 'DENY'
+
+# Prevent browsers from interpreting files as a different MIME type
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Ensure cookies are only sent over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+
+# Ensure the application uses HTTPS
+SECURE_SSL_REDIRECT = True
+
+# Content Security Policy settings
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com')
+CSP_SCRIPT_SRC = ("'self'", 'https://cdnjs.cloudflare.com')
+CSP_IMG_SRC = ("'self'", 'data:')
+CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com')
+CSP_CONNECT_SRC = ("'self'",)
