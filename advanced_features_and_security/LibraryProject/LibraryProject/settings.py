@@ -112,13 +112,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
 # Enable the browser's XSS filter
-SECURE_BROWSER_XSS_FILTER = True
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filtering
 
 # Enable the X-Frame-Options header
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'DENY' # Prevent framing on the site
 
 # Prevent browsers from interpreting files as a different MIME type
-SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_CONTENT_TYPE_NOSNIFF = True   # Prevent MIME-type sniffing
 
 # Ensure cookies are only sent over HTTPS
 CSRF_COOKIE_SECURE = True
@@ -127,6 +127,11 @@ SESSION_COOKIE_HTTPONLY = True
 
 # Ensure the application uses HTTPS
 SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security (HSTS) settings
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Content Security Policy settings
 CSP_DEFAULT_SRC = ("'self'",)
