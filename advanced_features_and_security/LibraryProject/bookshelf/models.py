@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 class Library(models.Model):
     name = models.CharField(max_length=200)
@@ -15,18 +16,19 @@ class Library(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=200)
-    author = models.ForeignKey('Author', on_delete=models.CASCADE)
-    publication_year = models.IntegerField(default=2000)
-
-    def __str__(self):
-        return self.title
+    author = models.CharField(max_length=200)
+    publication_year = models.IntegerField()
 
     class Meta:
         permissions = [
-            ("can_add_book", "Can add a book"),
-            ("can_change_book", "Can change a book"),
-            ("can_delete_book", "Can delete a book"),
+            ("can_view", "Can view book"),
+            ("can_create", "Can create book"),
+            ("can_edit", "Can edit book"),
+            ("can_delete", "Can delete book"),
         ]
+
+    def __str__(self):
+        return self.title
 
 class Author(models.Model):
     name = models.CharField(max_length=200)
