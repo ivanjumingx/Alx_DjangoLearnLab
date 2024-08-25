@@ -1,6 +1,30 @@
 from django import forms
 from .models import Book
 
+class ExampleForm(forms.Form):
+    # Fields for a generic example form
+    name = forms.CharField(max_length=100, required=True)
+    email = forms.EmailField(required=True)
+    message = forms.CharField(widget=forms.Textarea, required=True)
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if not name:
+            raise forms.ValidationError('Name is required.')
+        return name
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not email:
+            raise forms.ValidationError('Email is required.')
+        return email
+
+    def clean_message(self):
+        message = self.cleaned_data.get('message')
+        if not message:
+            raise forms.ValidationError('Message is required.')
+        return message
+
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
