@@ -3,6 +3,21 @@ from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseForbidden
 from .models import Book
 from .forms import BookForm
+from .forms import ExampleForm
+
+def example_view(request):
+    if request.method == 'POST':
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Process the form data
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+            # You can handle the data here, e.g., saving it or sending an email
+            return redirect('success')  # Redirect to a success page
+    else:
+        form = ExampleForm()
+    return render(request, 'bookshelf/example_form.html', {'form': form})
 
 # View for listing books
 def book_list(request):
