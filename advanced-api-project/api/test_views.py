@@ -1,6 +1,7 @@
-from django.urls import reverse
-from rest_framework import status
+from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
+from rest_framework import status
+from django.urls import reverse
 from api.models import Book, Author
 from api.serializers import BookSerializer
 
@@ -8,14 +9,19 @@ from api.serializers import BookSerializer
 class BookTests(APITestCase):
 
     def setUp(self):
-        # Create an author and a book to be used in tests
+        # Create a user
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+
+        # Log in the user
+        self.client.login(username='testuser', password='testpassword')
+
+        # Create an author and books to be used in the tests
         self.author = Author.objects.create(name="George Orwell")
         self.book = Book.objects.create(
             title="1984", publication_year=1949, author=self.author)
         self.book2 = Book.objects.create(
             title="Animal Farm", publication_year=1945, author=self.author)
         self.book_list_url = reverse('book-list')  # URL for list view
-
 
 
     def test_create_book(self):
