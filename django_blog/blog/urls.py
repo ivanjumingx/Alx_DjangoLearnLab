@@ -23,7 +23,7 @@ urlpatterns = [
 
     # Comment management
     path('posts/<int:post_id>/comments/new/', add_comment, name='add_comment'),
-    path('comment/<int:pk>/edit/', CommentUpdateView.as_view(), name='edit_comment'),
+    path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='edit_comment'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),
 
     # Search and tagging
