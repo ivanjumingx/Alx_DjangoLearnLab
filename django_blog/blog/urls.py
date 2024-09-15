@@ -4,7 +4,7 @@ from . import views
 from .views import (
     PostListView, PostDetailView, PostCreateView, PostUpdateView,
     PostDeleteView, add_comment, CommentUpdateView, CommentDeleteView,
-    search_posts, tagged_posts
+    search_posts, tagged_posts, PostByTagListView
 )
 
 urlpatterns = [
@@ -29,4 +29,7 @@ urlpatterns = [
     # Search and tagging
     path('search/', search_posts, name='search_posts'),
     path('tags/<slug:tag_slug>/', tagged_posts, name='tagged_posts'),  # Updated tag route
+
+    # URL pattern for posts by tag
+    path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='posts_by_tag'),
 ]
