@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import CommentForm
 from django.db.models import Q
 from .models import Tag
+from taggit.models import Tag
 
 
 def register(request):
@@ -145,18 +146,18 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 def search_posts(request):
     query = request.GET.get('q')
+    posts = Post.objects.none()  # Default to an empty queryset
+
     if query:
         posts = Post.objects.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
             Q(tags__name__icontains=query)
         ).distinct()
-    else:
-        posts = Post.objects.none()
 
     return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
 
-def tagged_posts(request, tag_name):
-    tag = get_object_or_404(Tag, name=tag_name)
-    posts = tag.posts.all()
-    return render(request, 'blog/tagged_posts.html', {'posts': posts, 'tag': tag})
+def tagged_posts(request, tag_slug):
+    tag = get_object_or_404(Tag, slug=tag_slug)
+    posts = Post.objects.filter(tags__in=[tag])
+    return render(request, 'blog/post_list.html', {'posts': posts, 'tag': tag})
