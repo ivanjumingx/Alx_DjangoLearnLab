@@ -1,7 +1,8 @@
-<!-- blog/templates/registration/login.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
@@ -16,15 +17,18 @@
         </nav>
     </header>
     <div class="content">
-        <h2>Login</h2>
-        <form method="post">
+        <h1>Login</h1>
+        <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Login</button>
         </form>
+        {% if form.errors %}
+            <p class="error">Please correct the errors below.</p>
+        {% endif %}
     </div>
     <footer>
-        <p>&copy; 2024 Your Blog</p>
+        <p>&copy; 2024 Your Blog. All rights reserved.</p>
     </footer>
 </body>
 </html>
