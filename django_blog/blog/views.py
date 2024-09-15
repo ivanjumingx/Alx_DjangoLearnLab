@@ -7,6 +7,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.urls import reverse_lazy
 from .forms import UserRegistrationForm, UserProfileForm, PostForm
 from .models import Post
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 def register(request):
     if request.method == 'POST':
@@ -48,34 +49,37 @@ def profile(request):
 
 class PostListView(ListView):
     model = Post
-    template_name = 'blog/post_list.html'
-    context_object_name = 'posts'
+    template_name = 'post_list.html'
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'blog/post_detail.html'
+    template_name = 'post_detail.html'
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    form_class = PostForm
-    template_name = 'blog/post_form.html'
+    fields = ['title', 'content']
+    template_name = 'post_form.html'
+    success_url = reverse_lazy('post_list')
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class PostUpdateView(LoginRequiredMixin, UpdateView):
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    form_class = PostForm
-    template_name = 'blog/post_form.html'
-
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user)
-
-class PostDeleteView(LoginRequiredMixin, DeleteView):
-    model = Post
-    template_name = 'blog/post_confirm_delete.html'
+    fields = ['title', 'content']
+    template_name = 'post_form.html'
     success_url = reverse_lazy('post_list')
 
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user)
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    template_name = 'post_confirm_delete.html'
+    success_url = reverse_lazy('post_list')
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
