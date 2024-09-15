@@ -101,24 +101,30 @@ def add_comment(request, post_id):
         form = CommentForm()
     return render(request, 'comment_form.html', {'form': form, 'post': post})
 
+
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
-    fields = ['content']
+    form_class = CommentForm
     template_name = 'comment_form.html'
-    success_url = '/'
 
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
+
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = 'comment_confirm_delete.html'
-    success_url = '/'
 
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
