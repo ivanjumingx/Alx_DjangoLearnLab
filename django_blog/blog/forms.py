@@ -22,6 +22,7 @@ class PostForm(forms.ModelForm):
         fields = ['title', 'content', 'tags']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
+            'tags': TagWidget(),
         }
 
 class CommentForm(forms.ModelForm):
