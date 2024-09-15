@@ -16,6 +16,7 @@
                     <li><a href="{% url 'post_update' object.pk %}">Edit</a></li>
                     <li><a href="{% url 'post_delete' object.pk %}">Delete</a></li>
                 {% endif %}
+                <li><a href="{% url 'search_posts' %}">Search</a></li> <!-- Add a search link if needed -->
             </ul>
         </nav>
     </header>
@@ -23,6 +24,46 @@
         <h1>{{ object.title }}</h1>
         <p>{{ object.content }}</p>
         <p><small>By {{ object.author }} on {{ object.published_date }}</small></p>
+
+        <!-- Display Tags -->
+        <p>Tags: 
+            {% if object.tags.all %}
+                {% for tag in object.tags.all %}
+                    <a href="{% url 'tagged_posts' tag.name %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            {% else %}
+                No tags
+            {% endif %}
+        </p>
+
+        <!-- Add Comment Form -->
+        {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'add_comment' object.pk %}">
+                {% csrf_token %}
+                <textarea name="content" placeholder="Add a comment..." required></textarea>
+                <button type="submit">Submit Comment</button>
+            </form>
+        {% else %}
+            <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
+        {% endif %}
+
+        <!-- Display Comments -->
+        <h2>Comments</h2>
+        {% if object.comments.all %}
+            <ul>
+                {% for comment in object.comments.all %}
+                    <li>
+                        <p><strong>{{ comment.author }}:</strong> {{ comment.content }}</p>
+                        {% if user.is_authenticated and user == comment.author %}
+                            <a href="{% url 'edit_comment' comment.pk %}">Edit</a> |
+                            <a href="{% url 'delete_comment' comment.pk %}">Delete</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No comments yet.</p>
+        {% endif %}
     </div>
     <footer>
         <p>&copy; 2024 Your Blog. All rights reserved.</p>
