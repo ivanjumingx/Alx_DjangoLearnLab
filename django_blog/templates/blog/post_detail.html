@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ object.title }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'post_list' %}">Home</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'post_update' object.pk %}">Edit</a></li>
+                    <li><a href="{% url 'post_delete' object.pk %}">Delete</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <div class="content">
+        <h1>{{ object.title }}</h1>
+        <p>{{ object.content }}</p>
+        <p><small>By {{ object.author }} on {{ object.published_date }}</small></p>
+    </div>
+    <footer>
+        <p>&copy; 2024 Your Blog. All rights reserved.</p>
+    </footer>
+</body>
+</html>
