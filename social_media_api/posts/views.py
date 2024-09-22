@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
-from .models import Post, Comment
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from accounts.models import CustomUser
+from notifications.models import Notification
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
@@ -51,4 +52,41 @@ class FeedView(APIView):
         ]
 
         return Response(post_data, status=status.HTTP_200_OK)
+
+
+class LikePost(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = Post.objects.get(pk=pk)
+        user = request.user
+
+        if Like.objects.filter(user=user, post=post).exists():
+            return Response({"message": "You've already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+
+        like = Like.objects.create(user=user, post=post)
+
+        # Create notification for the post author
+        Notification.objects.create(
+            recipient=post.author,
+            actor=user,
+            verb='liked',
+            target=post
+        )
+
+        return Response({"message": "Post liked successfully."}, status=status.HTTP_201_CREATED)
+
+class UnlikePost(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = Post.objects.get(pk=pk)
+        user = request.user
+
+        try:
+            like = Like.objects.get(user=user, post=post)
+            like.delete()
+            return Response({"message": "Post unliked successfully."}, status=status.HTTP_200_OK)
+        except Like.DoesNotExist:
+            return Response({"error": "You haven't liked this post yet."}, status=status.HTTP_400_BAD_REQUEST)
 
