@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -29,9 +29,15 @@ class FeedView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        followed_users = user.followers.all()  # Get users this user is following
-        posts = Post.objects.filter(author__in=followed_users).order_by('-created_at')
+        user = request.user  # Get the authenticated user
+
+        # Get all users the current user is following
+        following_users = user.following.all()  # Use following.all() to get the list of followed users
+
+        # Filter posts from users the current user is following, ordered by creation date (latest first)
+        posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
+
+        # Prepare the response data
         post_data = [
             {
                 "id": post.id,
@@ -39,8 +45,10 @@ class FeedView(APIView):
                 "title": post.title,
                 "content": post.content,
                 "created_at": post.created_at,
+                "updated_at": post.updated_at,
             }
             for post in posts
         ]
+
         return Response(post_data, status=status.HTTP_200_OK)
 
