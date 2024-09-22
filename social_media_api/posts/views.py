@@ -4,6 +4,7 @@ from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework.views import APIView
 from accounts.models import CustomUser
 from notifications.models import Notification
@@ -58,18 +59,19 @@ class LikePost(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = Post.objects.get(pk=pk)
-        user = request.user
+        # Use get_object_or_404 to safely retrieve the post or return a 404 error if not found
+        post = generics.get_object_or_404(Post, pk=pk)
 
-        if Like.objects.filter(user=user, post=post).exists():
+        # Use get_or_create to like the post, ensuring no duplicate likes
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        if not created:
             return Response({"message": "You've already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
-
-        like = Like.objects.create(user=user, post=post)
 
         # Create notification for the post author
         Notification.objects.create(
             recipient=post.author,
-            actor=user,
+            actor=request.user,
             verb='liked',
             target=post
         )
@@ -80,11 +82,12 @@ class UnlikePost(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = Post.objects.get(pk=pk)
-        user = request.user
+        # Use get_object_or_404 to retrieve the post
+        post = generics.get_object_or_404(Post, pk=pk)
 
+        # Try to retrieve the like and delete it
         try:
-            like = Like.objects.get(user=user, post=post)
+            like = Like.objects.get(user=request.user, post=post)
             like.delete()
             return Response({"message": "Post unliked successfully."}, status=status.HTTP_200_OK)
         except Like.DoesNotExist:
